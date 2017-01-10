@@ -63,13 +63,13 @@ public class PhoenixHBaseQueryTranslatorTest {
     public void testDateEq() throws ParseException, ClassNotFoundException {
 
         PhoenixHBaseQueryTranslator translator = new PhoenixHBaseQueryTranslator(entityPropertiesResolver);
-        String dateString = "2011-12-19 18:35:34 PDT PST";
+        String dateString = "2011-12-19 18:35:34 IST";
         Date date = getDate(dateString);
         String result = translator.eq("deliveryDate", date);
         Assert.assertNotNull(result);
         System.out.println(result);
         Assert.assertTrue(StringUtils.containsAny(result, dateString));
-        String expected = "deliveryDate = TO_DATE('2011-12-19 17:35:34 PST', 'yyyy-MM-dd HH:mm:ss z')";
+        String expected = "deliveryDate = TO_DATE('2011-12-19 18:35:34 IST', 'yyyy-MM-dd HH:mm:ss z')";
         Assert.assertEquals(expected, result);
     }
 

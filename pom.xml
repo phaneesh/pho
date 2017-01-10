@@ -23,7 +23,7 @@
         <slf4j.version>1.7.10</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <hamcrest.version>1.3</hamcrest.version>
-        <apache-phoenix-version>4.4.0-HBase-1.1-client-minimal</apache-phoenix-version>
+        <apache-phoenix-version>4.4.0.2.4.2.0-258</apache-phoenix-version>
         <junit.version>4.7</junit.version>
         <junit.version>4.7</junit.version>
         <protostuff-version>1.0.7-eh-2</protostuff-version>
@@ -55,7 +55,7 @@
         <!-- HBASE DEPS START -->
         <dependency>
             <groupId>org.apache.phoenix</groupId>
-            <artifactId>phoenix</artifactId>
+            <artifactId>phoenix-core</artifactId>
             <version>${apache-phoenix-version}</version>
         </dependency>
         <dependency>
@@ -315,11 +315,58 @@
       <tag>HEAD</tag>
   </scm>
 
+    <!--<distributionManagement>-->
+        <!--<repository>-->
+            <!--<id>ossrh</id>-->
+            <!--<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+        <!--</repository>-->
+    <!--</distributionManagement>-->
+
+    <repositories>
+        <!-- HDP Repositories -->
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <id>HDPReleases</id>
+            <name>HDP Releases</name>
+            <url>http://repo.hortonworks.com/content/repositories/releases/</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+            <id>HDPPublic</id>
+            <name>HDP Public</name>
+            <url>http://repo.hortonworks.com/content/repositories/public/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>phonepe-releases</id>
+            <url>http://artifactory.phonepe.com/content/repositories/releases</url>
         </repository>
+        <snapshotRepository>
+            <id>phonepe-snapshots</id>
+            <url>http://artifactory.phonepe.com/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <licenses>
@@ -414,89 +461,89 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <id>enforce-ban-version-downgrades</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireUpperBoundDeps />
-                            </rules>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>enforce-ban-duplicate-classes</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <banDuplicateClasses>
-                                    <ignoreClasses>
-                                        <!-- mockito and junit share no issue -->
-                                        <ignoreClass>org.hamcrest.*</ignoreClass>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-enforcer-plugin</artifactId>-->
+                <!--<version>1.2</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>enforce-ban-version-downgrades</id>-->
+                        <!--<goals>-->
+                            <!--<goal>enforce</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<rules>-->
+                                <!--<requireUpperBoundDeps />-->
+                            <!--</rules>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                    <!--<execution>-->
+                        <!--<id>enforce-ban-duplicate-classes</id>-->
+                        <!--<goals>-->
+                            <!--<goal>enforce</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<rules>-->
+                                <!--<banDuplicateClasses>-->
+                                    <!--<ignoreClasses>-->
+                                        <!--&lt;!&ndash; mockito and junit share no issue &ndash;&gt;-->
+                                        <!--<ignoreClass>org.hamcrest.*</ignoreClass>-->
 
-                                        <!-- Objenesis is stored within Mockito-all, 
-                                            which is test scope. -->
-                                        <ignoreClass>org.objenesis.*</ignoreClass>
+                                        <!--&lt;!&ndash; Objenesis is stored within Mockito-all, -->
+                                            <!--which is test scope. &ndash;&gt;-->
+                                        <!--<ignoreClass>org.objenesis.*</ignoreClass>-->
 
-                                        <!--commons-beanutils and commons-collections 
-                                            co-existence problem -->
-                                        <ignoreClass>org.apache.commons.collections.*</ignoreClass>
+                                        <!--&lt;!&ndash;commons-beanutils and commons-collections -->
+                                            <!--co-existence problem &ndash;&gt;-->
+                                        <!--<ignoreClass>org.apache.commons.collections.*</ignoreClass>-->
 
-                                        <!-- spring-context, spring-context-support 
-                                            possible issue -->
-                                        <ignoreClass>org.springframework.cache.ehcache.*</ignoreClass>
+                                        <!--&lt;!&ndash; spring-context, spring-context-support -->
+                                            <!--possible issue &ndash;&gt;-->
+                                        <!--<ignoreClass>org.springframework.cache.ehcache.*</ignoreClass>-->
 
-                                        <!-- aspectj no issue -->
-                                        <ignoreClass>org.aspectj.*</ignoreClass>
-                                        <ignoreClass>org.w3c.dom.*</ignoreClass>
-                                        <ignoreClass>org.xml.sax.*</ignoreClass>
+                                        <!--&lt;!&ndash; aspectj no issue &ndash;&gt;-->
+                                        <!--<ignoreClass>org.aspectj.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.w3c.dom.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.xml.sax.*</ignoreClass>-->
 
-                                        <!-- Java web servce spec interfaces -->
-                                        <!-- <ignoreClass>javax.ws.*</ignoreClass> -->
+                                        <!--&lt;!&ndash; Java web servce spec interfaces &ndash;&gt;-->
+                                        <!--&lt;!&ndash; <ignoreClass>javax.ws.*</ignoreClass> &ndash;&gt;-->
 
-                                        <!-- servlet spec interfaces are 
-                                            shared across implementation libraries -->
-                                        <ignoreClass>javax.servlet.*</ignoreClass>
+                                        <!--&lt;!&ndash; servlet spec interfaces are -->
+                                            <!--shared across implementation libraries &ndash;&gt;-->
+                                        <!--<ignoreClass>javax.servlet.*</ignoreClass>-->
 
-                                        <!-- Possible conflict in future -->
-                                        <ignoreClass>net.sf.ehcache.*</ignoreClass>
+                                        <!--&lt;!&ndash; Possible conflict in future &ndash;&gt;-->
+                                        <!--<ignoreClass>net.sf.ehcache.*</ignoreClass>-->
 
-                                        <!--possible conflict in future -->
-                                        <ignoreClass>org.springframework.oxm.*</ignoreClass>
+                                        <!--&lt;!&ndash;possible conflict in future &ndash;&gt;-->
+                                        <!--<ignoreClass>org.springframework.oxm.*</ignoreClass>-->
 
-                                        <ignoreClass>org.xmlpull.v1.*</ignoreClass>
-                                        <ignoreClass>org.objectweb.asm.*</ignoreClass>
-                                        <ignoreClass>org.junit.*</ignoreClass>
-                                        <ignoreClass>org.powermock.api.*</ignoreClass>
-                                        <ignoreClass>org.powermock.modules.*</ignoreClass>
-                                        <ignoreClass>org.hornetq.api.jms.management.*</ignoreClass>
+                                        <!--<ignoreClass>org.xmlpull.v1.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.objectweb.asm.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.junit.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.powermock.api.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.powermock.modules.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.hornetq.api.jms.management.*</ignoreClass>-->
 
-                                        <ignoreClass>org.apache.hadoop.yarn.*</ignoreClass>
-                                        <ignoreClass>org.apache.jasper.*</ignoreClass>
-                                    </ignoreClasses>
-                                    <findAllDuplicates>true</findAllDuplicates>
-                                </banDuplicateClasses>
-                            </rules>
-                            <fail>true</fail>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>extra-enforcer-rules</artifactId>
-                        <version>1.0-alpha-3</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+                                        <!--<ignoreClass>org.apache.hadoop.yarn.*</ignoreClass>-->
+                                        <!--<ignoreClass>org.apache.jasper.*</ignoreClass>-->
+                                    <!--</ignoreClasses>-->
+                                    <!--<findAllDuplicates>true</findAllDuplicates>-->
+                                <!--</banDuplicateClasses>-->
+                            <!--</rules>-->
+                            <!--<fail>true</fail>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.codehaus.mojo</groupId>-->
+                        <!--<artifactId>extra-enforcer-rules</artifactId>-->
+                        <!--<version>1.0-alpha-3</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

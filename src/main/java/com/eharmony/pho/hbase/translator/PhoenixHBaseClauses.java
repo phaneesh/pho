@@ -8,7 +8,8 @@ import com.eharmony.pho.query.criterion.Symbolic;
 public enum PhoenixHBaseClauses implements Symbolic {
     FROM("FROM"),
     WHERE("WHERE"),
-    ORDER_BY("ORDER BY"), 
+    ORDER_BY("ORDER BY"),
+    OFFSET("OFFSET"),
     LIMIT("LIMIT");
 
     private final String symbol;

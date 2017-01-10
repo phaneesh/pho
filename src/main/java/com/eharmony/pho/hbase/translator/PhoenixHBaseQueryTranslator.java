@@ -84,6 +84,7 @@ public class PhoenixHBaseQueryTranslator extends AbstractQueryTranslator<String,
         Criterion rootCriterion = query.getCriteria();
         Orderings orders = query.getOrder();
         Integer maxResults = query.getMaxResults();
+        Integer offset = query.getOffset();
         Class<T> entityClass = query.getEntityClass();
 
         String projection = PROJECTION_ALL;
@@ -102,9 +103,11 @@ public class PhoenixHBaseQueryTranslator extends AbstractQueryTranslator<String,
         if (orders != null && CollectionUtils.isNotEmpty(orders.get())) {
             queryString = spaceJoiner.join(queryString, PhoenixHBaseClauses.ORDER_BY.symbol(), translateOrder(query));
         }
-        
         if(maxResults != null && maxResults > 0) {
             queryString = spaceJoiner.join(queryString, PhoenixHBaseClauses.LIMIT.symbol(), maxResults);
+        }
+        if(offset != null && offset > 0) {
+            queryString = spaceJoiner.join(queryString, PhoenixHBaseClauses.OFFSET.symbol(), offset);
         }
         return queryString;
     }

@@ -52,6 +52,14 @@ public interface QuerySelect<T, R> {
     public Orderings getOrder();
 
     /**
+     * Get the offset results. Null signifies no offset.
+     *
+     * @return the offset number
+     *
+     */
+    public Integer getOffset();
+
+    /**
      * Get the max desired results. Null signifies no maximum.
      * 
      * @return the maximum number of results or null if no maximum
@@ -65,5 +73,12 @@ public interface QuerySelect<T, R> {
      * @return <code>QueryOperationType</code> 
      */
     public QueryOperationType getQueryOperationType();
+
+    /**
+     * Getter method for Query Hint
+     *
+     * @return <code>String</code>
+     */
+    public String getQueryHint();
 
 }
