@@ -1,8 +1,12 @@
 package com.eharmony.pho.api;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.eharmony.pho.query.QuerySelect;
+import org.apache.commons.dbutils.ResultSetHandler;
+
 /**
  * Provides methods to operate with datastore.
  * @author vvangapandu
@@ -82,5 +86,21 @@ public interface DataStoreApi {
      * @return					updated entity.
      */
     <T> T save(T entity, List<String> selectedFields);
+
+
+    /**
+     * Get the underlying connection to execute queries that are not supported by pho
+     * @return underlying connection to the database of type {@link Connection}
+     */
+    Connection getConnection();
+
+    /**
+     * Execute a custom query and get the result as a typed entity
+     * @param query the SQL query which needs to be executed
+     * @param resultSetHandler Result Transformer of type {@link ResultSetHandler}
+     * @param <K> TYpe of entity returned
+     * @return
+     */
+    <K> K executeCustomQuery(String query, ResultSetHandler<K> resultSetHandler, Object... parameters);
     
 }
