@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Strings;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -86,13 +87,14 @@ public class PhoenixHBaseQueryTranslator extends AbstractQueryTranslator<String,
         Integer maxResults = query.getMaxResults();
         Integer offset = query.getOffset();
         Class<T> entityClass = query.getEntityClass();
-
+        Joiner spaceJoiner = Joiner.on(" ");
         String projection = PROJECTION_ALL;
         if (CollectionUtils.isNotEmpty(fields)) {
             projection = Joiner.on(", ").join(
                     entityPropertiesResolver.resolveEntityMappingPropertyNames(fields, entityClass));
         }
-        Joiner spaceJoiner = Joiner.on(" ");
+        //Add query hint if available
+        projection = Strings.isNullOrEmpty(query.getQueryHint()) ? projection : spaceJoiner.join(query.getQueryHint(), PROJECTION_ALL);
         String queryString = spaceJoiner.join(new String[] { SELECT, projection, PhoenixHBaseClauses.FROM.symbol(),
                 entityResolver.resolve(entityClass) });
 
@@ -103,6 +105,7 @@ public class PhoenixHBaseQueryTranslator extends AbstractQueryTranslator<String,
         if (orders != null && CollectionUtils.isNotEmpty(orders.get())) {
             queryString = spaceJoiner.join(queryString, PhoenixHBaseClauses.ORDER_BY.symbol(), translateOrder(query));
         }
+
         if(maxResults != null && maxResults > 0) {
             queryString = spaceJoiner.join(queryString, PhoenixHBaseClauses.LIMIT.symbol(), maxResults);
         }
@@ -243,12 +246,7 @@ public class PhoenixHBaseQueryTranslator extends AbstractQueryTranslator<String,
         return fieldName + " " + Joiner.on(" ").join(Lists.transform(Arrays.asList(parts), toString));
     }
 
-    private final Function<Object, String> toString = new Function<Object, String>(){
-        @Override
-        public String apply(Object o) {
-            return string(o);
-        }
-    };
+    private final Function<Object, String> toString = o -> string(o);
 
     protected String string(Object o) {
         if (o instanceof Object[]) {
@@ -344,7 +342,7 @@ public class PhoenixHBaseQueryTranslator extends AbstractQueryTranslator<String,
             int position = 1;
             Set<String> entityFields = entityPropertyBindings.keySet();
             if (CollectionUtils.isEmpty(selectedFields)) {
-                selectedFields = new ArrayList<String>(entityFields);
+                selectedFields = new ArrayList<>(entityFields);
             }
             for (String beanPropertyName : selectedFields) {
                 EntityPropertyBinding entityPropertyBinding = entityPropertyBindings.get(beanPropertyName);
